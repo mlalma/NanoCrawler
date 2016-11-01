@@ -1,0 +1,14 @@
+NanoCrawler is a lightweight web crawler library written in Java
+and based on crawler4j 3.5 by Yasser Ganjisaffar (see more on
+https://code.google.com/p/crawler4j/).
+
+The code has been refactored, some small bugs have been fixed
+and some new features have been added such as the support for
+URL link prioritization. The web pages are now parsed using
+Validator.nu HTML parser (http://about.validator.nu/htmlparser/).
+
+All the required 3rd party libraries are located in lib/.
+
+NanoCrawler-Simple-TestApp is a simple test application based
+on respective crawler4j's example app that shows NanoCrawler in
+action.

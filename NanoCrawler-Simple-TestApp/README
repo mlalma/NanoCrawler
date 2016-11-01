@@ -1,0 +1,6 @@
+Simple test application for NanoCrawler. Crawls through a defined
+domain and presents stats of the crawled pages.
+
+Required external libraries are located on /lib, you need to also
+compile NanoCrawler and add it to the Java project as well to run 
+this application.

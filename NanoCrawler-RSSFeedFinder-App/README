@@ -1,0 +1,10 @@
+NanoCrawler-RSSFeedFinder-App is a bit more complex example that
+searches for RSS feeds from a given domain. To run the application,
+you need to compile and include following CFTA libraries (can be 
+found from https://github.com/mlalma/CFTA) in addition to NanoCrawler:
+- yarfraw (RSS feed parser)
+- CFTA-Lib-RSSFeedFetcher (API for RSS feed parsing)
+- CFTA-Lib-WebFetcher (Required by RSS feed parser libs)
+- CFTA-Lib-FrontEnd-DataStructures and CFTA-Lib-Util (Utility methods)
+
+The required 3rd party libraries are in /lib. 
