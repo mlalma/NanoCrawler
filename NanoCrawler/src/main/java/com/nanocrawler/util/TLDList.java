@@ -35,7 +35,13 @@ public class TLDList {
         // Constructor
 	protected TLDList(String path) {
             try {
-                InputStream stream = new FileInputStream(new File(path));
+            	InputStream stream;
+            	if (path == null) {
+            		stream = getClass().getResourceAsStream("/resources/" + tldNamesFileName);
+            	} else {
+            		stream = new FileInputStream(new File(path));            		
+            	}
+            	
                 if (stream == null) {
                     System.err.println("Couldn't find " + tldNamesFileName);
                     System.exit(-1);

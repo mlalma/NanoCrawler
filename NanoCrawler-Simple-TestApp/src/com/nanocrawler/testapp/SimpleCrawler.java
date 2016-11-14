@@ -61,16 +61,14 @@ public class SimpleCrawler extends WebCrawler {
         String parentUrl = page.getWebURL().getParentUrl();
         String anchor = page.getWebURL().getAnchor();
 
-        // Uncomment these to see more information about the crawled page
-        /*
+        // Uncomment these to see more information about the crawled page        
         System.out.println("Docid: " + docid);
         System.out.println("URL: " + url);
         System.out.println("Domain: '" + domain + "'");
         System.out.println("Sub-domain: '" + subDomain + "'");
         System.out.println("Path: '" + path + "'");
         System.out.println("Parent page: " + parentUrl);
-        System.out.println("Anchor text: " + anchor);
-        */
+        System.out.println("Anchor text: " + anchor);        
 
         if (page.getParseData() instanceof HtmlContent) {
             HtmlContent htmlParseData = (HtmlContent) page.getParseData();

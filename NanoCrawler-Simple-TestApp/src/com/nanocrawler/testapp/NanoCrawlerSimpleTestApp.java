@@ -27,17 +27,24 @@ import com.nanocrawler.util.CrawlConfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 // Simple test application that crawls pages under a pre-set domain
 public class NanoCrawlerSimpleTestApp {
     
-    private final String BASE_DOMAIN = "http://www.gamespot.com";
+    private final String BASE_DOMAIN = "http://www.hs.fi/";
 
     private void doMain() throws Exception {
+    	//BasicConfigurator.configure();
+    	//Logger logger = Logger.getRootLogger();
+    	//logger.setLevel(Level.DEBUG);
         // Set this to a valid temp directory that is used during the crawl 
-        String crawlStorageFolder = ".\\crawl_test";
+        String crawlStorageFolder = "/tmp";
         
         // Check that path is valid and the file is there
-        CrawlConfig config = new CrawlConfig(".\\res\\tld-names.txt");
+        CrawlConfig config = new CrawlConfig("./res/tld-names.txt");
         config.setCrawlStorageFolder(crawlStorageFolder);
         
         PageFetcher pageFetcher = new PageFetcher(config);
