@@ -5,21 +5,23 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.data;
 
 import com.nanocrawler.urlmanipulation.WebURL;
+
 import java.nio.charset.Charset;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -57,32 +59,67 @@ public class Page {
 
         Charset charset = ContentType.getOrDefault(entity).getCharset();
         if (charset != null) {
-            contentCharset = charset.displayName();	
+            contentCharset = charset.displayName();
         }
 
         contentData = EntityUtils.toByteArray(entity);
     }
 
     // Setters and getters
-    
-    public WebURL getWebURL() { return url; }
-    public void setWebURL(WebURL url) { this.url = url; }
 
-    public Header[] getFetchResponseHeaders() { return fetchResponseHeaders; }
-    public void setFetchResponseHeaders(Header[] headers) { fetchResponseHeaders = headers; }
+    public WebURL getWebURL() {
+        return url;
+    }
 
-    public Content getParseData() { return parseData; }
-    public void setParseData(Content parseData) { this.parseData = parseData; }
+    public void setWebURL(WebURL url) {
+        this.url = url;
+    }
 
-    public byte[] getContentData() { return contentData; }
-    public void setContentData(byte[] contentData) { this.contentData = contentData; }
+    public Header[] getFetchResponseHeaders() {
+        return fetchResponseHeaders;
+    }
 
-    public String getContentType() { return contentType; }
-    public void setContentType(String contentType) { this.contentType = contentType; }
+    public void setFetchResponseHeaders(Header[] headers) {
+        fetchResponseHeaders = headers;
+    }
 
-    public String getContentEncoding() { return contentEncoding; }
-    public void setContentEncoding(String contentEncoding) { this.contentEncoding = contentEncoding; }
+    public Content getParseData() {
+        return parseData;
+    }
 
-    public String getContentCharset() { return contentCharset; }
-    public void setContentCharset(String contentCharset) { this.contentCharset = contentCharset; }
+    public void setParseData(Content parseData) {
+        this.parseData = parseData;
+    }
+
+    public byte[] getContentData() {
+        return contentData;
+    }
+
+    public void setContentData(byte[] contentData) {
+        this.contentData = contentData;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getContentEncoding() {
+        return contentEncoding;
+    }
+
+    public void setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+    }
+
+    public String getContentCharset() {
+        return contentCharset;
+    }
+
+    public void setContentCharset(String contentCharset) {
+        this.contentCharset = contentCharset;
+    }
 }

@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.util;
@@ -45,22 +45,22 @@ public class CrawlConfig {
     private int maxDownloadSize = 1048576;
 
     private boolean followRedirects = true;
-    
+
     private String tldResourceFilePath = "";
-    
+
     // Proxy configuration parameters in case
     private String proxyHost = null;
     private int proxyPort = 80;
     private String proxyUsername = null;
     private String proxyPassword = null;
-    
+
     private static TLDList TLDListInstance;
-            
+
     // Constructor
     public CrawlConfig(String tldResourceFilePath) {
         TLDListInstance = new TLDList(tldResourceFilePath);
     }
-        
+
     // Configuration validation
     public void validate() throws Exception {
         if (crawlStorageFolder == null) {
@@ -78,62 +78,154 @@ public class CrawlConfig {
     }
 
     // Setters / getters for the configuration
-    
-    public static TLDList getTLDListInstance() { return TLDListInstance; }
-     
-    public String getCrawlStorageFolder() { return crawlStorageFolder; }
-    public void setCrawlStorageFolder(String crawlStorageFolder) { this.crawlStorageFolder = crawlStorageFolder; }
 
-    public int getMaxDepthOfCrawling() { return maxDepthOfCrawling; }
-    public void setMaxDepthOfCrawling(int maxDepthOfCrawling) { this.maxDepthOfCrawling = maxDepthOfCrawling; }
+    public static TLDList getTLDListInstance() {
+        return TLDListInstance;
+    }
 
-    public int getMaxPagesToFetch() { return maxPagesToFetch; }
-    public void setMaxPagesToFetch(int maxPagesToFetch) { this.maxPagesToFetch = maxPagesToFetch; }
+    public String getCrawlStorageFolder() {
+        return crawlStorageFolder;
+    }
 
-    public String getUserAgentString() { return userAgentString; }
-    public void setUserAgentString(String userAgentString) { this.userAgentString = userAgentString; }
+    public void setCrawlStorageFolder(String crawlStorageFolder) {
+        this.crawlStorageFolder = crawlStorageFolder;
+    }
 
-    public int getPolitenessDelay() { return politenessDelay; }
-    public void setPolitenessDelay(int politenessDelay) { this.politenessDelay = politenessDelay; }
+    public int getMaxDepthOfCrawling() {
+        return maxDepthOfCrawling;
+    }
 
-    public boolean isIncludeHttpsPages() { return includeHttpsPages; }
-    public void setIncludeHttpsPages(boolean includeHttpsPages) { this.includeHttpsPages = includeHttpsPages; }
+    public void setMaxDepthOfCrawling(int maxDepthOfCrawling) {
+        this.maxDepthOfCrawling = maxDepthOfCrawling;
+    }
 
-    public boolean isIncludeBinaryContentInCrawling() { return includeBinaryContentInCrawling; }
-    public void setIncludeBinaryContentInCrawling(boolean includeBinaryContentInCrawling) { this.includeBinaryContentInCrawling = includeBinaryContentInCrawling; }
+    public int getMaxPagesToFetch() {
+        return maxPagesToFetch;
+    }
 
-    public int getMaxConnectionsPerHost() { return maxConnectionsPerHost; }
-    public void setMaxConnectionsPerHost(int maxConnectionsPerHost) { this.maxConnectionsPerHost = maxConnectionsPerHost; }
+    public void setMaxPagesToFetch(int maxPagesToFetch) {
+        this.maxPagesToFetch = maxPagesToFetch;
+    }
 
-    public int getMaxTotalConnections() { return maxTotalConnections; }
-    public void setMaxTotalConnections(int maxTotalConnections) { this.maxTotalConnections = maxTotalConnections; }
+    public String getUserAgentString() {
+        return userAgentString;
+    }
 
-    public int getSocketTimeout() { return socketTimeout; } 
-    public void setSocketTimeout(int socketTimeout) { this.socketTimeout = socketTimeout; }
+    public void setUserAgentString(String userAgentString) {
+        this.userAgentString = userAgentString;
+    }
 
-    public int getConnectionTimeout() { return connectionTimeout; }
-    public void setConnectionTimeout(int connectionTimeout) { this.connectionTimeout = connectionTimeout; }
+    public int getPolitenessDelay() {
+        return politenessDelay;
+    }
 
-    public int getMaxOutgoingLinksToFollow() { return maxOutgoingLinksToFollow; }
-    public void setMaxOutgoingLinksToFollow(int maxOutgoingLinksToFollow) { this.maxOutgoingLinksToFollow = maxOutgoingLinksToFollow; }
+    public void setPolitenessDelay(int politenessDelay) {
+        this.politenessDelay = politenessDelay;
+    }
 
-    public int getMaxDownloadSize() { return maxDownloadSize; }
-    public void setMaxDownloadSize(int maxDownloadSize) { this.maxDownloadSize = maxDownloadSize; }
+    public boolean isIncludeHttpsPages() {
+        return includeHttpsPages;
+    }
 
-    public boolean isFollowRedirects() { return followRedirects; }
-    public void setFollowRedirects(boolean followRedirects) { this.followRedirects = followRedirects; }
+    public void setIncludeHttpsPages(boolean includeHttpsPages) {
+        this.includeHttpsPages = includeHttpsPages;
+    }
 
-    public String getProxyHost() { return proxyHost; }
-    public void setProxyHost(String proxyHost) { this.proxyHost = proxyHost; }
+    public boolean isIncludeBinaryContentInCrawling() {
+        return includeBinaryContentInCrawling;
+    }
 
-    public int getProxyPort() { return proxyPort; }
-    public void setProxyPort(int proxyPort) { this.proxyPort = proxyPort; }
+    public void setIncludeBinaryContentInCrawling(boolean includeBinaryContentInCrawling) {
+        this.includeBinaryContentInCrawling = includeBinaryContentInCrawling;
+    }
 
-    public String getProxyUsername() { return proxyUsername; }
-    public void setProxyUsername(String proxyUsername) { this.proxyUsername = proxyUsername; }
+    public int getMaxConnectionsPerHost() {
+        return maxConnectionsPerHost;
+    }
 
-    public String getProxyPassword() { return proxyPassword; }
-    public void setProxyPassword(String proxyPassword) { this.proxyPassword = proxyPassword; }
+    public void setMaxConnectionsPerHost(int maxConnectionsPerHost) {
+        this.maxConnectionsPerHost = maxConnectionsPerHost;
+    }
+
+    public int getMaxTotalConnections() {
+        return maxTotalConnections;
+    }
+
+    public void setMaxTotalConnections(int maxTotalConnections) {
+        this.maxTotalConnections = maxTotalConnections;
+    }
+
+    public int getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    public void setSocketTimeout(int socketTimeout) {
+        this.socketTimeout = socketTimeout;
+    }
+
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
+    public int getMaxOutgoingLinksToFollow() {
+        return maxOutgoingLinksToFollow;
+    }
+
+    public void setMaxOutgoingLinksToFollow(int maxOutgoingLinksToFollow) {
+        this.maxOutgoingLinksToFollow = maxOutgoingLinksToFollow;
+    }
+
+    public int getMaxDownloadSize() {
+        return maxDownloadSize;
+    }
+
+    public void setMaxDownloadSize(int maxDownloadSize) {
+        this.maxDownloadSize = maxDownloadSize;
+    }
+
+    public boolean isFollowRedirects() {
+        return followRedirects;
+    }
+
+    public void setFollowRedirects(boolean followRedirects) {
+        this.followRedirects = followRedirects;
+    }
+
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public void setProxyHost(String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    public int getProxyPort() {
+        return proxyPort;
+    }
+
+    public void setProxyPort(int proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+
+    public String getProxyUsername() {
+        return proxyUsername;
+    }
+
+    public void setProxyUsername(String proxyUsername) {
+        this.proxyUsername = proxyUsername;
+    }
+
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    public void setProxyPassword(String proxyPassword) {
+        this.proxyPassword = proxyPassword;
+    }
 
     @Override
     public String toString() {

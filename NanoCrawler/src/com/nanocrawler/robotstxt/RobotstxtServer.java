@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.robotstxt;
@@ -23,11 +23,13 @@ import com.nanocrawler.data.PageFetchResult;
 import com.nanocrawler.fetcher.PageFetcher;
 import com.nanocrawler.urlmanipulation.WebURL;
 import com.nanocrawler.util.ContentTypeUtil;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.http.HttpStatus;
 
 // Fetches the robots.txt file (if one is available) and parses it
@@ -64,7 +66,7 @@ public class RobotstxtServer {
             }
 
             if (directives == null) {
-                    directives = fetchDirectives(url);
+                directives = fetchDirectives(url);
             }
             return directives.allows(path);
         } catch (MalformedURLException e) {
@@ -82,7 +84,7 @@ public class RobotstxtServer {
         robotsTxtUrl.setURL("http://" + host + port + "/robots.txt");
         HostDirectives directives = null;
         PageFetchResult fetchResult = null;
-        
+
         try {
             fetchResult = pageFetcher.fetchHeader(robotsTxtUrl);
             // TO_DO: Does this work on redirects e.g. http://news.ycombinator.com/robots.txt -> https://news.ycombinator.com/robots.txt
@@ -108,11 +110,11 @@ public class RobotstxtServer {
                 fetchResult.discardContentIfNotConsumed();
             }
         }
-        
+
         if (directives == null) {
             directives = new HostDirectives();
         }
-        
+
         synchronized (host2directivesCache) {
             if (host2directivesCache.size() == config.getCacheSize()) {
                 String minHost = null;

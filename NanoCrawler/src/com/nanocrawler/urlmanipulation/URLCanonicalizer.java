@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.urlmanipulation;
@@ -32,13 +32,13 @@ import java.util.TreeMap;
 /**
  * See http://en.wikipedia.org/wiki/URL_normalization for a reference Note: some
  * parts of the code are adapted from: http://stackoverflow.com/a/4057470/405418
- * 
+ *
  * @author Yasser Ganjisaffar <lastname at gmail dot com>
  */
 public class URLCanonicalizer {
 
     public static String getCanonicalURL(String url) {
-            return getCanonicalURL(url, null);
+        return getCanonicalURL(url, null);
     }
 
     public static String getCanonicalURL(String href, String context) {
@@ -111,16 +111,16 @@ public class URLCanonicalizer {
             URL result = new URL(protocol, host, port, pathAndQueryString);
             return result.toExternalForm();
         } catch (MalformedURLException ex) {
-                return null;
+            return null;
         } catch (URISyntaxException ex) {
-                return null;
+            return null;
         }
     }
 
     /**
      * Takes a query string, separates the constituent name-value pairs, and
      * stores them in a SortedMap ordered by lexicographical order.
-     * 
+     *
      * @return Null if there is no query string.
      */
     private static SortedMap<String, String> createParameterMap(final String queryString) {
@@ -138,16 +138,16 @@ public class URLCanonicalizer {
 
             String[] tokens = pair.split("=", 2);
             switch (tokens.length) {
-            case 1:
-                if (pair.charAt(0) == '=') {
+                case 1:
+                    if (pair.charAt(0) == '=') {
                         params.put("", tokens[0]);
-                } else {
+                    } else {
                         params.put(tokens[0], "");
-                }
-                break;
-            case 2: 
-                params.put(tokens[0], tokens[1]);
-                break;
+                    }
+                    break;
+                case 2:
+                    params.put(tokens[0], tokens[1]);
+                    break;
             }
         }
         return new TreeMap<>(params);
@@ -155,7 +155,7 @@ public class URLCanonicalizer {
 
     /**
      * Canonicalize the query string.
-     * 
+     *
      * @param sortedParamMap
      *            Parameter name-value pairs in lexicographical order.
      * @return Canonical form of query string.
@@ -187,7 +187,7 @@ public class URLCanonicalizer {
      * Percent-encode values according the RFC 3986. The built-in Java
      * URLEncoder does not encode according to the RFC, so we make the extra
      * replacements.
-     * 
+     *
      * @param string
      *            Decoded string.
      * @return Encoded string per RFC 3986.

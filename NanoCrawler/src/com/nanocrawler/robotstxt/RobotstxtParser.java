@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.robotstxt;
@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 public class RobotstxtParser {
 
     // TO_DO: ADD CRAWL_DELAY
-    
+
     private static final String PATTERNS_USERAGENT = "(?i)^User-agent:.*";
     private static final String PATTERNS_DISALLOW = "(?i)Disallow:.*";
     private static final String PATTERNS_ALLOW = "(?i)Allow:.*";
@@ -36,14 +36,14 @@ public class RobotstxtParser {
     // Parses robots.txt file
     public static HostDirectives parse(String content, String myUserAgent) {
         HostDirectives directives = null;
-        boolean inMatchingUserAgent = false;		
+        boolean inMatchingUserAgent = false;
 
         StringTokenizer st = new StringTokenizer(content, "\n");
         while (st.hasMoreTokens()) {
             String line = st.nextToken();
 
             int commentIndex = line.indexOf("#");
-            if (commentIndex > -1) {				
+            if (commentIndex > -1) {
                 line = line.substring(0, commentIndex);
             }
 
@@ -58,7 +58,7 @@ public class RobotstxtParser {
             if (line.matches(PATTERNS_USERAGENT)) {
                 String ua = line.substring(PATTERNS_USERAGENT_LENGTH).trim().toLowerCase();
                 if (ua.equals("*") || ua.contains(myUserAgent)) {
-                    inMatchingUserAgent = true;					
+                    inMatchingUserAgent = true;
                 } else {
                     inMatchingUserAgent = false;
                 }
@@ -75,8 +75,8 @@ public class RobotstxtParser {
                     if (directives == null) {
                         directives = new HostDirectives();
                     }
-                    directives.addDisallow(path);	
-                }								
+                    directives.addDisallow(path);
+                }
             } else if (line.matches(PATTERNS_ALLOW)) {
                 if (!inMatchingUserAgent) {
                     continue;
@@ -90,9 +90,9 @@ public class RobotstxtParser {
                     directives = new HostDirectives();
                 }
                 directives.addAllow(path);
-            }			
+            }
         }
-        
+
         return directives;
     }
 }

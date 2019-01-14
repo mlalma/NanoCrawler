@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.dbs;
@@ -22,23 +22,25 @@ import com.nanocrawler.util.CrawlConfig;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.nanocrawler.urlmanipulation.WebURL;
+
 import java.util.List;
+
 import org.apache.log4j.Logger;
 
 // Keeps track of the URLs that are still to be crawled
-public class Frontier  {
+public class Frontier {
     protected static final Logger logger = Logger.getLogger(Frontier.class.getName());
 
     protected final Object mutex = new Object();
     protected final Object waitingList = new Object();
 
     protected boolean isFinished = false;
-    
+
     protected CrawledURLQueueServer workQueues;
     protected long scheduledPages;
     protected DocIDServer docIdServer;
     protected CrawlStatisticsServer crawlStatisticsServer;
-    
+
     private final CrawlConfig config;
 
     // Constructor
@@ -66,12 +68,12 @@ public class Frontier  {
                     logger.error("Error while puting the url in the work queue.");
                 }
             }
-            
+
             if (newScheduledPage > 0) {
                 scheduledPages += newScheduledPage;
-                crawlStatisticsServer.increment(CrawlStatisticsServer.SCHEDULED_PAGES, newScheduledPage);	
+                crawlStatisticsServer.increment(CrawlStatisticsServer.SCHEDULED_PAGES, newScheduledPage);
             }
-            
+
             synchronized (waitingList) {
                 waitingList.notifyAll();
             }
@@ -121,7 +123,7 @@ public class Frontier  {
                 }
             } catch (InterruptedException ex) {
             }
-            
+
             if (isFinished) {
                 return;
             }

@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.contentparser;
@@ -30,7 +30,7 @@ public class PlainTextContentParser implements ContentParser {
     // Checks mime type of the page
     public boolean canParseContent(String mimeType) {
         String typeStr = mimeType.toLowerCase();
-        if (typeStr.contains("text/plain")) {		   
+        if (typeStr.contains("text/plain")) {
             return true;
         } else {
             return false;
@@ -41,7 +41,7 @@ public class PlainTextContentParser implements ContentParser {
     // Simple parser, stores the text content of the page
     public Content parseContent(Page page, String contextURL) {
         PlainTextContent c = new PlainTextContent();
-        
+
         UniversalDetector detector = new UniversalDetector(null);
         detector.handleData(page.getContentData(), 0, page.getContentData().length);
         detector.dataEnd();
@@ -51,12 +51,12 @@ public class PlainTextContentParser implements ContentParser {
             try {
                 c.setTextContent(new String(page.getContentData(), encoding));
             } catch (Exception ex) {
-                c.setTextContent(new String(page.getContentData()));               
+                c.setTextContent(new String(page.getContentData()));
             }
         } else {
             c.setTextContent(new String(page.getContentData()));
-        }                        
-        
+        }
+
         return c;
-    }    
+    }
 }

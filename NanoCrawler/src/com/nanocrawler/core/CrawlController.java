@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.core;
@@ -28,9 +28,11 @@ import com.nanocrawler.util.CrawlConfig;
 import com.nanocrawler.util.IO;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 
 // Controller for managing the crawling session and WebCrawler instances
@@ -43,7 +45,7 @@ public class CrawlController implements Runnable {
 
     // Status flag indicating for an external shut down command
     protected boolean shuttingDown;
-    
+
     protected PageFetcher pageFetcher;
     protected RobotstxtServer robotstxtServer;
     protected Frontier frontier;
@@ -51,15 +53,15 @@ public class CrawlController implements Runnable {
     protected CrawlConfig config;
 
     protected final Object waitingLock = new Object();
-    
+
     protected List<Thread> threads = new ArrayList<>();
     protected List<WebCrawler> crawlers = new ArrayList<>();
 
     // Constructor
     public CrawlController(CrawlConfig config, PageFetcher pageFetcher, RobotstxtServer robotstxtServer) throws Exception {
-        this.config = config;  
+        this.config = config;
         config.validate();
-                
+
         // Creates a folder for temporary data
         File folder = new File(config.getCrawlStorageFolder());
         if (!folder.exists()) {
@@ -67,7 +69,7 @@ public class CrawlController implements Runnable {
                 throw new Exception("Couldn't create this folder: " + folder.getAbsolutePath());
             }
         }
-        
+
         logger.info("Setting envconfig");
 
         // Configuration for Berkley DB instances
@@ -81,11 +83,11 @@ public class CrawlController implements Runnable {
                 throw new Exception("Couldn't create this folder: " + envHome.getAbsolutePath());
             }
         }
-        IO.deleteFolderContents(envHome);        
+        IO.deleteFolderContents(envHome);
         Environment env = new Environment(envHome, envConfig);
-        
+
         logger.info("setting servers");
-        
+
         // Berkley DB servers for storing data
         docIdServer = new DocIDServer(env, config);
         frontier = new Frontier(env, docIdServer, config);
@@ -96,7 +98,7 @@ public class CrawlController implements Runnable {
         finished = true;
         shuttingDown = false;
     }
-    
+
     // Adds a new seed URL. A seed URL is a URL that is fetched by the crawler
     // to extract new URLs in it and follow them for crawling. If specified docId is -1, 
     // then a new docId is assigned for the page URL 
@@ -125,14 +127,14 @@ public class CrawlController implements Runnable {
         webUrl.setURL(canonicalUrl);
         webUrl.setDocid(docId);
         webUrl.setDepth((short) 0);
-        
+
         if (!robotstxtServer.allows(webUrl)) {
             logger.info("Robots.txt does not allow this seed: " + pageUrl);
         } else {
             frontier.scheduleURLForCrawling(webUrl);
         }
     }
-    
+
     // Adds "seen URL" to doc ID database
     public void addSeenUrl(String url, int docId) {
         String canonicalUrl = URLCanonicalizer.getCanonicalURL(url);
@@ -146,7 +148,7 @@ public class CrawlController implements Runnable {
             logger.error("Could not add seen url: " + e.getMessage());
         }
     }
-    
+
     // Start crawling using list of seed urls, list of crawlers and flag indicating whether the main thread 
     // should be blocked until the crawling has completed
     public void startCrawling(List<WebCrawler> c, List<String> seedUrls, boolean isBlocking) {
@@ -155,21 +157,21 @@ public class CrawlController implements Runnable {
         }
         this.start(c, isBlocking);
     }
-    
+
     // Starts the crawling
     private void start(List<WebCrawler> c, boolean isBlocking) {
         if (!finished) {
             throw new RuntimeException("Cannot start crawling when it's already underway!");
         }
-        
-        try {            
+
+        try {
             finished = false;
-            
+
             threads.clear();
             crawlers.clear();
 
             for (WebCrawler crawler : c) {
-                crawler.getThread().start();                
+                crawler.getThread().start();
                 crawlers.add(crawler);
                 threads.add(crawler.getThread());
                 logger.info("Crawler " + crawler.getId() + " started.");
@@ -182,7 +184,7 @@ public class CrawlController implements Runnable {
                 waitUntilFinish();
             }
         } catch (Exception e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -209,9 +211,9 @@ public class CrawlController implements Runnable {
         } catch (Exception ignored) {
         }
     }
-    
+
     // Monitors crawler threads to check if they have stopped
-    @Override   
+    @Override
     public void run() {
         try {
             synchronized (waitingLock) {
@@ -228,7 +230,7 @@ public class CrawlController implements Runnable {
                             someoneIsWorking = true;
                         }
                     }
-                    if (!someoneIsWorking) {                        
+                    if (!someoneIsWorking) {
                         logger.info("It looks like no thread is working, waiting for 5 seconds to make sure...");
                         sleep(5);
 
@@ -255,7 +257,7 @@ public class CrawlController implements Runnable {
                             }
 
                             logger.info("All of the crawlers are stopped. Finishing the process...");
-                            
+
                             // Frontier informs web crawler threads to stop
                             frontier.finish();
                             for (WebCrawler crawler : crawlers) {
@@ -289,22 +291,47 @@ public class CrawlController implements Runnable {
         logger.info("Shutting down...");
         this.shuttingDown = true;
         frontier.finish();
-    }    
+    }
 
     // Setters / getters for various variables
-    
-    public void setPageFetcher(PageFetcher pageFetcher) { this.pageFetcher = pageFetcher; }
-    public PageFetcher getPageFetcher() { return pageFetcher; }
 
-    public RobotstxtServer getRobotstxtServer() { return robotstxtServer; }
-    public void setRobotstxtServer(RobotstxtServer robotstxtServer) { this.robotstxtServer = robotstxtServer; }
+    public void setPageFetcher(PageFetcher pageFetcher) {
+        this.pageFetcher = pageFetcher;
+    }
 
-    public void setFrontier(Frontier frontier) { this.frontier = frontier; }
-    public Frontier getFrontier() { return frontier; }
+    public PageFetcher getPageFetcher() {
+        return pageFetcher;
+    }
 
-    public void setDocIdServer(DocIDServer docIdServer) { this.docIdServer = docIdServer; }   
-    public DocIDServer getDocIdServer() { return docIdServer; }
-    
-    public boolean isFinished() { return this.finished; }
-    public boolean isShuttingDown() { return shuttingDown; }
+    public RobotstxtServer getRobotstxtServer() {
+        return robotstxtServer;
+    }
+
+    public void setRobotstxtServer(RobotstxtServer robotstxtServer) {
+        this.robotstxtServer = robotstxtServer;
+    }
+
+    public void setFrontier(Frontier frontier) {
+        this.frontier = frontier;
+    }
+
+    public Frontier getFrontier() {
+        return frontier;
+    }
+
+    public void setDocIdServer(DocIDServer docIdServer) {
+        this.docIdServer = docIdServer;
+    }
+
+    public DocIDServer getDocIdServer() {
+        return docIdServer;
+    }
+
+    public boolean isFinished() {
+        return this.finished;
+    }
+
+    public boolean isShuttingDown() {
+        return shuttingDown;
+    }
 }

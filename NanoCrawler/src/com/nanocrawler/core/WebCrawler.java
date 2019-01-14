@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.core;
@@ -30,8 +30,10 @@ import com.nanocrawler.fetcher.PageFetcher;
 import com.nanocrawler.robotstxt.RobotstxtServer;
 import com.nanocrawler.urlmanipulation.WebURL;
 import com.nanocrawler.util.CrawlConfig;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 
@@ -63,12 +65,12 @@ public class WebCrawler implements Runnable {
 
     // Is crawler working or are all the crawl queue items managed
     private boolean isWaitingForNewURLs;
-    
+
     // Configuration for the crawling process
     private CrawlConfig config;
-    
+
     // Constructor
-    public WebCrawler(CrawlConfig config) {    
+    public WebCrawler(CrawlConfig config) {
         this.config = config;
     }
 
@@ -80,19 +82,25 @@ public class WebCrawler implements Runnable {
         this.docIdServer = crawlController.getDocIdServer();
         this.frontier = crawlController.getFrontier();
         this.parser = new Parser(config);
-        this.isWaitingForNewURLs = false;        
-        this.myThread = new Thread(this, "Crawler" + this.id);        
+        this.isWaitingForNewURLs = false;
+        this.myThread = new Thread(this, "Crawler" + this.id);
     }
 
     // Returns ID of the crawler
-    public int getId() { return id; }
-    
+    public int getId() {
+        return id;
+    }
+
     // Getter for the thread
-    public Thread getThread() { return myThread; }
-    
+    public Thread getThread() {
+        return myThread;
+    }
+
     // Returns status
-    public boolean isNotWaitingForNewURLs() { return !isWaitingForNewURLs; }
-    
+    public boolean isNotWaitingForNewURLs() {
+        return !isWaitingForNewURLs;
+    }
+
     // Called just before the crawling starts
     public void onStart() {
         // Do nothing by default
@@ -122,7 +130,7 @@ public class WebCrawler implements Runnable {
         // Do nothing by default
         // Sub-classed can override this to add their custom functionality
     }
-    
+
     // Can be used to set per-URL priority
     protected byte URLPriority(WebURL webUrl) {
         return 0;
@@ -138,14 +146,14 @@ public class WebCrawler implements Runnable {
         // Do nothing by default
         // Sub-classed can override this to add their custom functionality
     }
-    
+
     // The core method -- executed by the thread
     @Override
     public void run() {
         onStart();
         while (true) {
             List<WebURL> assignedURLs = new ArrayList<>(50);
-            
+
             // Should this change to LinkedBlockingQueue instead??
             isWaitingForNewURLs = true;
             frontier.getNextURLsForCrawling(1, assignedURLs);
@@ -170,7 +178,7 @@ public class WebCrawler implements Runnable {
             }
         }
     }
-    
+
     // Processes a single page given the URL
     private void processPage(WebURL curURL) {
         PageFetchResult fetchResult;
@@ -178,7 +186,7 @@ public class WebCrawler implements Runnable {
         if (curURL == null) {
             return;
         }
-        
+
         // First parse header and check everything is OK
         try {
             fetchResult = fetchHeaderAndCheck(curURL);
@@ -188,7 +196,7 @@ public class WebCrawler implements Runnable {
         } catch (Exception ex) {
             return;
         }
-               
+
         // Fetch page, parse it, parse outgoing links and call visit() for custom handling of page
         try {
             fetchAndHandlePage(fetchResult, curURL);
@@ -197,8 +205,8 @@ public class WebCrawler implements Runnable {
         } finally {
             fetchResult.discardContentIfNotConsumed();
         }
-    }    
-    
+    }
+
     // Fetches page header and checks for redirection, page length etc to determine whether the page should be processed
     private PageFetchResult fetchHeaderAndCheck(WebURL curURL) {
         PageFetchResult fetchResult = pageFetcher.fetchHeader(curURL);
@@ -211,13 +219,13 @@ public class WebCrawler implements Runnable {
                     if (movedToUrl == null) {
                         return null;
                     }
-                    
+
                     int newDocId = docIdServer.getDocId(movedToUrl);
                     if (newDocId > 0) {
                         // Redirect page is already seen
                         return null;
                     }
-                    
+
                     WebURL webURL = new WebURL();
                     webURL.setURL(movedToUrl);
                     webURL.setParentDocid(curURL.getParentDocid());
@@ -226,7 +234,7 @@ public class WebCrawler implements Runnable {
                     webURL.setDocid(-1);
                     webURL.setAnchor(curURL.getAnchor());
                     webURL.setPriority(curURL.getPriority());
-                    
+
                     if (shouldVisit(webURL) && robotstxtServer.allows(webURL)) {
                         webURL.setDocid(docIdServer.createOrGetNewDocID(movedToUrl));
                         frontier.scheduleURLForCrawling(webURL);
@@ -246,10 +254,10 @@ public class WebCrawler implements Runnable {
             curURL.setURL(fetchResult.getFetchedUrl());
             curURL.setDocid(docIdServer.createOrGetNewDocID(fetchResult.getFetchedUrl()));
         }
-        
+
         return fetchResult;
     }
-    
+
     // Fetches and handles page
     private void fetchAndHandlePage(PageFetchResult fetchResult, WebURL curURL) {
         Page page = new Page(curURL);
@@ -270,7 +278,7 @@ public class WebCrawler implements Runnable {
             HtmlContent htmlParseData = (HtmlContent) parseData;
             List<WebURL> toSchedule = new ArrayList<>();
             int maxCrawlDepth = config.getMaxDepthOfCrawling();
-            
+
             // Parse each outgoing link from the page and add relevant ones to crawl queue
             for (WebURL webURL : htmlParseData.getOutgoingUrls()) {
                 webURL.setParentDocid(docid);
@@ -295,6 +303,6 @@ public class WebCrawler implements Runnable {
         }
 
         // Send the end result to visit() method for use
-        visit(page);        
+        visit(page);
     }
 }
