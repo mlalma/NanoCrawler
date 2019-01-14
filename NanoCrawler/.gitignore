@@ -8,6 +8,9 @@ dist/
 nbproject/
 test/
 
+.idea/
+NanoCrawler.iml
+
 # Mac OS X specific files
 .DS_Store
 .DS_Store?

@@ -18,17 +18,18 @@
  */
 package com.nanocrawler.fetcher;
 
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+
 import java.util.concurrent.TimeUnit;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
 
 // Closes long-running HTTP connections for releasing I/O resources
 public class IdleConnectionMonitorThread extends Thread {    
     
-    private final PoolingClientConnectionManager connMgr;
+    private final PoolingHttpClientConnectionManager connMgr;
     private volatile boolean shutdown;
 
     // Constructor
-    public IdleConnectionMonitorThread(PoolingClientConnectionManager connMgr) {
+    public IdleConnectionMonitorThread(PoolingHttpClientConnectionManager connMgr) {
         super("Connection Manager");
         this.connMgr = connMgr;
     }

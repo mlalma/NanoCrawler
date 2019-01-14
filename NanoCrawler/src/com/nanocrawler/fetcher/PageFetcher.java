@@ -40,13 +40,20 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.CoreProtocolPNames;
@@ -55,16 +62,20 @@ import org.apache.http.params.HttpProtocolParamBean;
 import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 // Page fetcher class
 public class PageFetcher {
     
     protected static final Logger logger = Logger.getLogger(PageFetcher.class);
     
-    protected DefaultHttpClient httpClient;
+    protected HttpClient httpClient;
     protected final Object mutex = new Object();
     protected long lastFetchTime = 0;
     
-    protected PoolingClientConnectionManager connectionManager;    
+    protected PoolingHttpClientConnectionManager connectionManager;
     protected IdleConnectionMonitorThread connectionMonitorThread = null;    
     
     private final CrawlConfig config;
@@ -91,50 +102,47 @@ public class PageFetcher {
         params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, config.getConnectionTimeout());
         params.setBooleanParameter("http.protocol.handle-redirects", false);
 
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+        RegistryBuilder<ConnectionSocketFactory> schemeRegistryBuilder = RegistryBuilder.create();
+        schemeRegistryBuilder.register("http", PlainConnectionSocketFactory.getSocketFactory());
+
         if (config.isIncludeHttpsPages()) {
-            schemeRegistry.register(new Scheme("https", 443, SSLSocketFactory.getSocketFactory()));
+            try {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                    }
+                };
+
+                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+                SSLConnectionSocketFactory sf = new SSLConnectionSocketFactory(sslContext);
+                schemeRegistryBuilder.register("https", sf);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
-        connectionManager = new PoolingClientConnectionManager(schemeRegistry);
+        connectionManager = new PoolingHttpClientConnectionManager(schemeRegistryBuilder.build());
         connectionManager.setMaxTotal(config.getMaxTotalConnections());
         connectionManager.setDefaultMaxPerRoute(config.getMaxConnectionsPerHost());
-        httpClient = new DefaultHttpClient(connectionManager, params);
+        httpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).build();
+
+        // Add params to HttpClient creation
+        //(connectionManager, params);
     }
             
     // Initializes fetcher and starts connection monitoring
     public void initialize() {
-        if (config.getProxyHost() != null) {
-            if (config.getProxyUsername() != null) {
-                httpClient.getCredentialsProvider().setCredentials(
-                    new AuthScope(config.getProxyHost(), config.getProxyPort()),
-                    new UsernamePasswordCredentials(config.getProxyUsername(), config.getProxyPassword()));
-            }
-
-            HttpHost proxy = new HttpHost(config.getProxyHost(), config.getProxyPort());
-            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
-        }
-
-        // Since fetcher is manually working on HTTP responses, gzipped response data has to be decompressed manually
-        httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
-            @Override
-            public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
-                HttpEntity entity = response.getEntity();
-                Header contentEncoding = entity.getContentEncoding();
-                               
-                if (contentEncoding != null) {
-                    HeaderElement[] codecs = contentEncoding.getElements();
-                    for (HeaderElement codec : codecs) {
-                        if (codec.getName().equalsIgnoreCase("gzip")) {                            
-                            response.setEntity(new GzipDecompressingEntity(response.getEntity()));
-                            return;
-                        }
-                    }
-                }
-            }
-        });
-
         if (connectionMonitorThread == null) {
             connectionMonitorThread = new IdleConnectionMonitorThread(connectionManager);
         }

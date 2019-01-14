@@ -18,8 +18,6 @@
  */
 package com.nanocrawler.data;
 
-import com.nanocrawler.data.Content;
-
 // Stub implementation for binary content
 public class BinaryContent implements Content {
  
