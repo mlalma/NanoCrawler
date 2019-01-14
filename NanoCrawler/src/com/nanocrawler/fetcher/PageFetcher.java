@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.fetcher;
@@ -23,84 +23,58 @@ import com.nanocrawler.data.PageFetchResult;
 import com.nanocrawler.urlmanipulation.URLCanonicalizer;
 import com.nanocrawler.urlmanipulation.WebURL;
 import com.nanocrawler.util.CrawlConfig;
-import java.io.IOException;
-import java.util.Date;
 import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.params.CoreProtocolPNames;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParamBean;
-import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
+import java.util.Date;
 
 // Page fetcher class
 public class PageFetcher {
-    
+
     protected static final Logger logger = Logger.getLogger(PageFetcher.class);
-    
+
     protected HttpClient httpClient;
+    protected final RequestConfig requestConfig;
     protected final Object mutex = new Object();
     protected long lastFetchTime = 0;
-    
+
     protected PoolingHttpClientConnectionManager connectionManager;
-    protected IdleConnectionMonitorThread connectionMonitorThread = null;    
-    
+    protected IdleConnectionMonitorThread connectionMonitorThread = null;
+
     private final CrawlConfig config;
-    
+
     private static PageFetcher instance = null;
-   
+
     // Returns HTTP client used in fetching pages
     public HttpClient getHttpClient() {
         return httpClient;
     }
-    
+
     // Constructor
     public PageFetcher(CrawlConfig config) {
         this.config = config;
-        
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParamBean paramsBean = new HttpProtocolParamBean(params);
-        paramsBean.setVersion(HttpVersion.HTTP_1_1);
-        paramsBean.setContentCharset("UTF-8");
-        paramsBean.setUseExpectContinue(false);
-        params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-        params.setParameter(CoreProtocolPNames.USER_AGENT, config.getUserAgentString());
-        params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, config.getSocketTimeout());
-        params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, config.getConnectionTimeout());
-        params.setBooleanParameter("http.protocol.handle-redirects", false);
+
+        requestConfig = RequestConfig.custom()
+                .setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY)
+                .setSocketTimeout(config.getSocketTimeout())
+                .setConnectTimeout(config.getConnectionTimeout())
+                .build();
 
         RegistryBuilder<ConnectionSocketFactory> schemeRegistryBuilder = RegistryBuilder.create();
         schemeRegistryBuilder.register("http", PlainConnectionSocketFactory.getSocketFactory());
@@ -109,19 +83,19 @@ public class PageFetcher {
             try {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return null;
-                        }
+                        new X509TrustManager() {
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                return null;
+                            }
 
-                        public void checkClientTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                        }
+                            public void checkClientTrusted(
+                                    java.security.cert.X509Certificate[] certs, String authType) {
+                            }
 
-                        public void checkServerTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
+                            public void checkServerTrusted(
+                                    java.security.cert.X509Certificate[] certs, String authType) {
+                            }
                         }
-                    }
                 };
 
                 sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
@@ -136,11 +110,8 @@ public class PageFetcher {
         connectionManager.setMaxTotal(config.getMaxTotalConnections());
         connectionManager.setDefaultMaxPerRoute(config.getMaxConnectionsPerHost());
         httpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).build();
-
-        // Add params to HttpClient creation
-        //(connectionManager, params);
     }
-            
+
     // Initializes fetcher and starts connection monitoring
     public void initialize() {
         if (connectionMonitorThread == null) {
@@ -158,13 +129,13 @@ public class PageFetcher {
                 Thread.sleep(config.getPolitenessDelay() - (now - lastFetchTime));
             }
             lastFetchTime = (new Date()).getTime();
-        }        
+        }
     }
-        
+
     // Checks the header and returns true / false depending on status code from the server
     private boolean checkHeader(PageFetchResult fetchResult, HttpResponse response, String toFetchURL, HttpGet get) {
         boolean headerOk = false;
-        
+
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode != HttpStatus.SC_OK) {
             if (statusCode != HttpStatus.SC_NOT_FOUND) {
@@ -174,7 +145,7 @@ public class PageFetcher {
                         String movedToUrl = header.getValue();
                         movedToUrl = URLCanonicalizer.getCanonicalURL(movedToUrl, toFetchURL);
                         fetchResult.setMovedToUrl(movedToUrl);
-                    } 
+                    }
                     fetchResult.setStatusCode(statusCode);
                 }
                 logger.info("Failed: " + response.getStatusLine().toString() + ", while fetching " + toFetchURL);
@@ -191,10 +162,10 @@ public class PageFetcher {
 
             headerOk = true;
         }
-    
+
         return headerOk;
     }
-    
+
     // Checks content length of the the body of the response (and if there is one)
     private boolean checkBody(PageFetchResult fetchResult, HttpResponse response) {
         boolean bodyOk = false;
@@ -218,22 +189,23 @@ public class PageFetcher {
                 fetchResult.setStatusCode(HttpStatus.SC_OK);
                 bodyOk = true;
             }
-        }        
+        }
         return bodyOk;
-    }    
+    }
 
     // Fetches header of a page given the URL
     public PageFetchResult fetchHeader(WebURL webUrl) {
         PageFetchResult fetchResult = new PageFetchResult();
         String toFetchURL = webUrl.getURL();
         HttpGet get = null;
-        
+
         try {
             get = new HttpGet(toFetchURL);
-            get.addHeader("Accept-Encoding", "gzip");
+            get.setConfig(requestConfig);
+            get.setHeader("User-Agent", config.getUserAgentString());
 
             waitForFetchStart();
-            
+
             HttpResponse response = httpClient.execute(get);
             fetchResult.setEntity(response.getEntity());
             fetchResult.setResponseHeaders(response.getAllHeaders());
@@ -247,7 +219,7 @@ public class PageFetcher {
             } else {
                 get.abort();
             }
-            
+
             return fetchResult;
         } catch (IOException e) {
             logger.error("Fatal transport error: " + e.getMessage() + " while fetching " + toFetchURL + " (link found in doc #" + webUrl.getParentDocid() + ")");
@@ -258,16 +230,16 @@ public class PageFetcher {
             // Ignoring exceptions that occur because of not registering https and other schemes
         } catch (Exception e) {
             if (e.getMessage() == null) {
-                    logger.error("Error while fetching " + webUrl.getURL());
+                logger.error("Error while fetching " + webUrl.getURL());
             } else {
-                    logger.error(e.getMessage() + " while fetching " + webUrl.getURL());
+                logger.error(e.getMessage() + " while fetching " + webUrl.getURL());
             }
         }
-        
+
         fetchResult.setStatusCode(CustomFetchStatus.UnknownError);
         return fetchResult;
     }
-    
+
     // Shuts down the connection manager 
     public synchronized void shutDown() {
         if (connectionMonitorThread != null) {
