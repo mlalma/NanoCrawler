@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -36,10 +36,10 @@ public class SimpleCrawler extends WebCrawler {
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g"
             + "|png|tiff?|mid|mp2|mp3|mp4"
             + "|wav|avi|mov|mpeg|ram|m4v|pdf"
-            + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+            + "|rm|smil|wmv|swf|wma|zip|rar|gz|ico|svg))$");
 
     // Constructor
-    public SimpleCrawler(CrawlConfig config, String baseDomain) {
+    SimpleCrawler(CrawlConfig config, String baseDomain) {
         super(config);
         this.baseDomain = baseDomain;
     }
@@ -77,11 +77,9 @@ public class SimpleCrawler extends WebCrawler {
             String html = htmlParseData.getHtml();
             List<WebURL> links = htmlParseData.getOutgoingUrls();
 
-            /*
             System.out.println("Text length: " + text.length());
             System.out.println("Html length: " + html.length());
             System.out.println("Number of outgoing links: " + links.size());
-            */
 
             System.out.println("Crawled web page: " + url);
         }
