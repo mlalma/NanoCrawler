@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ * <p>
  * Based on crawler4j project by Yasser Ganjisaffar
  */
 package com.nanocrawler.testapp;
@@ -23,36 +23,37 @@ import com.nanocrawler.data.HtmlContent;
 import com.nanocrawler.data.Page;
 import com.nanocrawler.urlmanipulation.WebURL;
 import com.nanocrawler.util.CrawlConfig;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
 // Simple implementation of a crawler, adapted from crawler4j example
 public class SimpleCrawler extends WebCrawler {
-    
+
     private final String baseDomain;
 
     // Filter out image, audio, video and similar binary files
-    private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g" 
-                                                          + "|png|tiff?|mid|mp2|mp3|mp4"
-                                                          + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
-                                                          + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-    
+    private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g"
+            + "|png|tiff?|mid|mp2|mp3|mp4"
+            + "|wav|avi|mov|mpeg|ram|m4v|pdf"
+            + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+
     // Constructor
     public SimpleCrawler(CrawlConfig config, String baseDomain) {
         super(config);
         this.baseDomain = baseDomain;
     }
-        
+
     @Override
     // Checks if the page give the url should be visited based on the domain
     public boolean shouldVisit(WebURL url) {
-        String href = url.getURL().toLowerCase();                
+        String href = url.getURL().toLowerCase();
         return !FILTERS.matcher(href).matches() && href.startsWith(baseDomain);
     }
-        
+
     @Override
     // Called after a page has been crawled; crawler can examine the page and perform data manipulations
-    public void visit(Page page) {          
+    public void visit(Page page) {
         int docid = page.getWebURL().getDocid();
         String url = page.getWebURL().getURL();
         String domain = page.getWebURL().getDomain();
@@ -68,7 +69,7 @@ public class SimpleCrawler extends WebCrawler {
         System.out.println("Sub-domain: '" + subDomain + "'");
         System.out.println("Path: '" + path + "'");
         System.out.println("Parent page: " + parentUrl);
-        System.out.println("Anchor text: " + anchor);        
+        System.out.println("Anchor text: " + anchor);
 
         if (page.getParseData() instanceof HtmlContent) {
             HtmlContent htmlParseData = (HtmlContent) page.getParseData();
@@ -81,7 +82,7 @@ public class SimpleCrawler extends WebCrawler {
             System.out.println("Html length: " + html.length());
             System.out.println("Number of outgoing links: " + links.size());
             */
-            
+
             System.out.println("Crawled web page: " + url);
         }
 

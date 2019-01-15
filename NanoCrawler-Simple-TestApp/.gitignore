@@ -10,6 +10,9 @@ nbproject/
 test/
 crawl_test/
 
+.idea/
+NanoCrawler-TestApp.iml
+
 # Package Files
 *.war
 *.ear
