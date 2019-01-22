@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,41 +19,41 @@ package com.nanocrawler.feedfinder;
 import com.cfta.cf.feeds.RSSFeedCleaner;
 import com.cfta.cf.feeds.RSSFeedParser;
 import com.cfta.cf.handlers.protocol.RSSFeedResponse;
+import com.cfta.rssfeed.parser.RSSFeedRecognizer;
+import com.cfta.rssfeed.xmlparser.XMLNode;
 import com.nanocrawler.core.WebCrawler;
 import com.nanocrawler.data.HtmlContent;
 import com.nanocrawler.data.Page;
 import com.nanocrawler.urlmanipulation.WebURL;
 import com.nanocrawler.util.CrawlConfig;
+
 import java.util.regex.Pattern;
-import org.apache.commons.io.IOUtils;
-import yarfraw.core.datamodel.FeedFormat;
-import yarfraw.utils.FeedFormatDetector;
 
 // RSS feed crawler - checks & prioritizes RSS feeds over all other contents
 public class RSSFeedCrawler extends WebCrawler {
 
     private final String baseDomain;
     private final RSSFeedCleaner c = new RSSFeedCleaner();
-        
+
     // Filter out image, audio, video and similar binary files
-    private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g" 
-                                                          + "|png|tiff?|mid|mp2|mp3|mp4"
-                                                          + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
-                                                          + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-    
+    private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g"
+            + "|png|tiff?|mid|mp2|mp3|mp4"
+            + "|wav|avi|mov|mpeg|ram|m4v|pdf"
+            + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+
     // Constructor
     public RSSFeedCrawler(CrawlConfig config, String baseDomain) {
         super(config);
         this.baseDomain = baseDomain;
     }
-        
+
     @Override
     // Checks if the page give the url should be visited based on the domain
     public boolean shouldVisit(WebURL url) {
-        String href = url.getURL().toLowerCase();                
+        String href = url.getURL().toLowerCase();
         return !FILTERS.matcher(href).matches() && href.startsWith(baseDomain);
     }
-    
+
     // Tests feed that it can be parsed OK and that it has RSS feed items that are not too old
     private boolean testFeed(String feed, String feedUrl) {
         final long RSS_ITEM_CUTOFF_TIME = 1000L * 60L * 60L * 24L * 30L;
@@ -70,7 +70,7 @@ public class RSSFeedCrawler extends WebCrawler {
                             break;
                         }
                     }
-                    
+
                     if (!feedOk) {
                         System.out.println("All items too old: " + feedUrl);
                     }
@@ -82,24 +82,29 @@ public class RSSFeedCrawler extends WebCrawler {
             System.out.println("Failed to get/read the feed: " + feedUrl);
             ex.printStackTrace();
         }
-        
+
         return feedOk;
     }
-    
+
     // Checks if page is a valid feed
     public boolean isRSSFeed(String page) {
         boolean isFeed = false;
         try {
-            if (page.length() > 0) {              
+            if (page.length() > 0) {
                 page = page.trim();
                 page = c.cleanFeedString(page);
-                FeedFormat fformat = FeedFormatDetector.getFormat(IOUtils.toInputStream(page.trim()), false);
-                if (fformat != FeedFormat.UNKNOWN) {
+
+                RSSFeedRecognizer feedRecognizer = new RSSFeedRecognizer();
+                XMLNode rootFeedNode = feedRecognizer.findFeedRootNode(page.trim());
+                RSSFeedRecognizer.RSSFeedType feedType = feedRecognizer.recognizeFeedType(rootFeedNode);
+
+                if (feedType != RSSFeedRecognizer.RSSFeedType.eUnknown) {
                     isFeed = true;
                 }
-            }    
-        } catch (Exception ex) {            
-        }        
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         return isFeed;
     }
 
@@ -107,20 +112,20 @@ public class RSSFeedCrawler extends WebCrawler {
     @Override
     protected byte URLPriority(WebURL webUrl) {
         byte priority = 100;
-        
+
         // Scanning priority for url, very simple heuristics, giving preference to links which have "rss" or "feed" in text or in path
         // This will cause (of course) false positives, but works pretty well in general
-        if (webUrl.getAnchor().toLowerCase().contains("rss") || webUrl.getAnchor().toLowerCase().contains("feed")  ||
-            webUrl.getURL().toLowerCase().contains("xml") || webUrl.getURL().toLowerCase().contains("rss") || webUrl.getAnchor().toLowerCase().contains("feed")) {
+        if (webUrl.getAnchor().toLowerCase().contains("rss") || webUrl.getAnchor().toLowerCase().contains("feed") ||
+                webUrl.getURL().toLowerCase().contains("xml") || webUrl.getURL().toLowerCase().contains("rss") || webUrl.getAnchor().toLowerCase().contains("feed")) {
             priority = 0;
         }
-                       
+
         return priority;
     }
-    
+
     @Override
     // Called after a page has been crawled; crawler can examine the page and perform data manipulations
-    public void visit(Page page) {                 
+    public void visit(Page page) {
         //System.out.println("Parsed page: " + page.getWebURL().getURL());
         if (page.getParseData() instanceof HtmlContent) {
             HtmlContent htmlParseData = (HtmlContent) page.getParseData();

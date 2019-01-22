@@ -9,10 +9,13 @@ dist/
 nbproject/
 test/
 crawl_test/
+.idea/
 
 # Package Files
 *.war
 *.ear
+
+NanoCrawler-RSSFeedFinder.iml
 
 # Mac OS X specific files
 .DS_Store
